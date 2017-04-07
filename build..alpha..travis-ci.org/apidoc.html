@@ -1,0 +1,209 @@
+<div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a
+
+        href="https://github.com/pburtchaell/redux-promise-middleware"
+
+    >redux-promise-middleware (v4.2.0)</a>
+</h1>
+<h4>Redux middleware for handling promises and optimistic updates</h4>
+<div class="apidocSectionDiv"><a
+    href="#apidoc.tableOfContents"
+    id="apidoc.tableOfContents"
+><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.redux-promise-middleware">module redux-promise-middleware</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.redux-promise-middleware.default">
+            function <span class="apidocSignatureSpan">redux-promise-middleware.</span>default
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.redux-promise-middleware" id="apidoc.module.redux-promise-middleware">module redux-promise-middleware</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.redux-promise-middleware.default" id="apidoc.element.redux-promise-middleware.default">
+        function <span class="apidocSignatureSpan">redux-promise-middleware.</span>default
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function promiseMiddleware() {
+  var config = arguments.length &#x3e; 0 &#x26;&#x26; arguments[0] !== undefined ? arguments[0] : {};
+
+  var promiseTypeSuffixes = config.promiseTypeSuffixes || defaultTypes;
+
+  return function (ref) {
+    var dispatch = ref.dispatch;
+
+
+    return function (next) {
+      return function (action) {
+        if (action.payload) {
+          if (!(0, _isPromise2.default)(action.payload) &#x26;&#x26; !(0, _isPromise2.default)(action.payload.promise)) {
+            return next(action);
+          }
+        } else {
+          return next(action);
+        }
+
+        // Deconstruct the properties of the original action object to constants
+        var type = action.type,
+            payload = action.payload,
+            meta = action.meta;
+
+        // Assign values for promise type suffixes
+
+        var _promiseTypeSuffixes = _slicedToArray(promiseTypeSuffixes, 3),
+            PENDING = _promiseTypeSuffixes[0],
+            FULFILLED = _promiseTypeSuffixes[1],
+            REJECTED = _promiseTypeSuffixes[2];
+
+<span class="apidocCodeCommentSpan">        /**
+         * @function getAction
+         * @description Utility function for creating a rejected or fulfilled
+         * flux standard action object.
+         * @param {boolean} Is the action rejected?
+         * @returns {object} action
+         */
+</span>
+
+        var getAction = function getAction(newPayload, isRejected) {
+          return _extends({
+            type: type + &#x27;_&#x27; + (isRejected ? REJECTED : FULFILLED)
+          }, newPayload === null || typeof newPayload === &#x27;undefined&#x27; ? {} : {
+            payload: newPayload
+          }, meta !== undefined ? { meta: meta } : {}, isRejected ? {
+            error: true
+          } : {});
+        };
+
+        /**
+         * Assign values for promise and data variables. In the case the payload
+         * is an object with a `promise` and `data` property, the values of those
+         * properties will be used. In the case the payload is a promise, the
+         * value of the payload will be used and data will be null.
+         */
+        var promise = void 0;
+        var data = void 0;
+
+        if (!(0, _isPromise2.default)(action.payload) &#x26;&#x26; _typeof(action.payload) === &#x27;object&#x27;) {
+          promise = payload.promise;
+          data = payload.data;
+        } else {
+          promise = payload;
+          data = undefined;
+        }
+
+        /**
+         * First, dispatch the pending action. This flux standard action object
+         * describes the pending state of a promise and will include any data
+         * (for optimistic updates) and/or meta from the original action.
+         */
+        next(_extends({
+          type: type + &#x27;_&#x27; + PENDING
+        }, data !== undefined ? { payload: data } : {}, meta !== undefined ? { meta: meta } : {}));
+
+        /*
+         * @function handleReject
+         * @description Dispatch the rejected action and return
+         * an error object. The error object is the original error
+         * that was thrown. The user of the library is responsible for
+         * best practices in ensure that they are throwing an Error object.
+         * @params reason The reason the promise was rejected
+         * @returns {object}
+         */
+        var handleReject = function handleReject(reason) {
+          var rejectedAction = getAction(reason, true);
+          dispatch(rejectedAction);
+          throw reason;
+        };
+
+        /*
+         * @function handleFulfill
+         * @description Dispatch the fulfilled action and
+         * return the success object. The success object should
+         * contain the value and the dispatched action.
+         * @param value The value the promise was resloved with
+         * @returns {object}
+         */
+        var handleFulfill = function handleFulfill() {
+          var value = arguments.length &#x3e; 0 &#x26;&#x26; arguments[0] !== undefined ? arguments[0] : null;
+
+          var resolvedAction = getAction(value, false);
+          dispatch(resolvedAction);
+
+          return { value: value, action: resolvedAction };
+        };
+
+        /**
+         * Second, dispatch a rejected or fulfilled action. This flux standard ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
