@@ -1,9 +1,14 @@
-# api documentation for  [redux-promise-middleware (v4.2.0)](https://github.com/pburtchaell/redux-promise-middleware)  [![npm package](https://img.shields.io/npm/v/npmdoc-redux-promise-middleware.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-redux-promise-middleware) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-redux-promise-middleware.svg)](https://travis-ci.org/npmdoc/node-npmdoc-redux-promise-middleware)
+# npmdoc-redux-promise-middleware
+
+#### api documentation for  [redux-promise-middleware (v4.2.0)](https://github.com/pburtchaell/redux-promise-middleware)  [![npm package](https://img.shields.io/npm/v/npmdoc-redux-promise-middleware.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-redux-promise-middleware) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-redux-promise-middleware.svg)](https://travis-ci.org/npmdoc/node-npmdoc-redux-promise-middleware)
+
 #### Redux middleware for handling promises and optimistic updates
 
-[![NPM](https://nodei.co/npm/redux-promise-middleware.png?downloads=true)](https://www.npmjs.com/package/redux-promise-middleware)
+[![NPM](https://nodei.co/npm/redux-promise-middleware.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/redux-promise-middleware)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/screenCapture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-redux-promise-middleware_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/apidoc.html)
+- [https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/apidoc.html](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/apidoc.html)
+
+[![apidoc](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/screenCapture.buildCi.browser.%252Ftmp%252Fbuild%252Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/apidoc.html)
 
 ![npmPackageListing](https://npmdoc.github.io/node-npmdoc-redux-promise-middleware/build/screenCapture.npmPackageListing.svg)
 
@@ -18,7 +23,6 @@
 {
     "author": {
         "name": "Patrick Burtchaell",
-        "email": "patrick@pburtchaell.com",
         "url": "pburtchaell.com"
     },
     "bugs": {
@@ -27,7 +31,6 @@
     "contributors": [
         {
             "name": "Thomas",
-            "email": "iammotivated@gmail.com",
             "url": "tomatao.co.uk"
         }
     ],
@@ -94,8 +97,7 @@
     "main": "dist/index.js",
     "maintainers": [
         {
-            "name": "pburtchaell",
-            "email": "patrick@pburtchaell.com"
+            "name": "pburtchaell"
         }
     ],
     "name": "redux-promise-middleware",
@@ -106,7 +108,6 @@
     "pre-commit": [
         "precommit"
     ],
-    "readme": "ERROR: No README data found!",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/pburtchaell/redux-promise-middleware.git"
@@ -126,136 +127,6 @@
     },
     "version": "4.2.0"
 }
-```
-
-
-
-# <a name="apidoc.tableOfContents"></a>[table of contents](#apidoc.tableOfContents)
-
-#### [module redux-promise-middleware](#apidoc.module.redux-promise-middleware)
-1.  [function <span class="apidocSignatureSpan">redux-promise-middleware.</span>default ()](#apidoc.element.redux-promise-middleware.default)
-
-
-
-# <a name="apidoc.module.redux-promise-middleware"></a>[module redux-promise-middleware](#apidoc.module.redux-promise-middleware)
-
-#### <a name="apidoc.element.redux-promise-middleware.default"></a>[function <span class="apidocSignatureSpan">redux-promise-middleware.</span>default ()](#apidoc.element.redux-promise-middleware.default)
-- description and source-code
-```javascript
-function promiseMiddleware() {
-  var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  var promiseTypeSuffixes = config.promiseTypeSuffixes || defaultTypes;
-
-  return function (ref) {
-    var dispatch = ref.dispatch;
-
-
-    return function (next) {
-      return function (action) {
-        if (action.payload) {
-          if (!(0, _isPromise2.default)(action.payload) && !(0, _isPromise2.default)(action.payload.promise)) {
-            return next(action);
-          }
-        } else {
-          return next(action);
-        }
-
-        // Deconstruct the properties of the original action object to constants
-        var type = action.type,
-            payload = action.payload,
-            meta = action.meta;
-
-        // Assign values for promise type suffixes
-
-        var _promiseTypeSuffixes = _slicedToArray(promiseTypeSuffixes, 3),
-            PENDING = _promiseTypeSuffixes[0],
-            FULFILLED = _promiseTypeSuffixes[1],
-            REJECTED = _promiseTypeSuffixes[2];
-
-<span class="apidocCodeCommentSpan">        /**
-         * @function getAction
-         * @description Utility function for creating a rejected or fulfilled
-         * flux standard action object.
-         * @param {boolean} Is the action rejected?
-         * @returns {object} action
-         */
-</span>
-
-        var getAction = function getAction(newPayload, isRejected) {
-          return _extends({
-            type: type + '_' + (isRejected ? REJECTED : FULFILLED)
-          }, newPayload === null || typeof newPayload === 'undefined' ? {} : {
-            payload: newPayload
-          }, meta !== undefined ? { meta: meta } : {}, isRejected ? {
-            error: true
-          } : {});
-        };
-
-        /**
-         * Assign values for promise and data variables. In the case the payload
-         * is an object with a 'promise' and 'data' property, the values of those
-         * properties will be used. In the case the payload is a promise, the
-         * value of the payload will be used and data will be null.
-         */
-        var promise = void 0;
-        var data = void 0;
-
-        if (!(0, _isPromise2.default)(action.payload) && _typeof(action.payload) === 'object') {
-          promise = payload.promise;
-          data = payload.data;
-        } else {
-          promise = payload;
-          data = undefined;
-        }
-
-        /**
-         * First, dispatch the pending action. This flux standard action object
-         * describes the pending state of a promise and will include any data
-         * (for optimistic updates) and/or meta from the original action.
-         */
-        next(_extends({
-          type: type + '_' + PENDING
-        }, data !== undefined ? { payload: data } : {}, meta !== undefined ? { meta: meta } : {}));
-
-        /*
-         * @function handleReject
-         * @description Dispatch the rejected action and return
-         * an error object. The error object is the original error
-         * that was thrown. The user of the library is responsible for
-         * best practices in ensure that they are throwing an Error object.
-         * @params reason The reason the promise was rejected
-         * @returns {object}
-         */
-        var handleReject = function handleReject(reason) {
-          var rejectedAction = getAction(reason, true);
-          dispatch(rejectedAction);
-          throw reason;
-        };
-
-        /*
-         * @function handleFulfill
-         * @description Dispatch the fulfilled action and
-         * return the success object. The success object should
-         * contain the value and the dispatched action.
-         * @param value The value the promise was resloved with
-         * @returns {object}
-         */
-        var handleFulfill = function handleFulfill() {
-          var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-          var resolvedAction = getAction(value, false);
-          dispatch(resolvedAction);
-
-          return { value: value, action: resolvedAction };
-        };
-
-        /**
-         * Second, dispatch a rejected or fulfilled action. This flux standard ...
-```
-- example usage
-```shell
-n/a
 ```
 
 
